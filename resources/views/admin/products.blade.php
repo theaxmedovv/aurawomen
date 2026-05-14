@@ -91,12 +91,10 @@
                     <tr class="group hover:bg-slate-50/80 transition-all">
                         <td class="px-6 py-4">
                             <div class="w-16 h-16 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
-                                @if($product->image)
-                                    <img src="{{ asset('storage/' . $product->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                @if($product->image && \Illuminate\Support\Facades\Storage::disk('public')->exists($product->image))
+                                    <img src="{{ asset('storage/' . $product->image) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="{{ $product->name }}">
                                 @else
-                                    <div class="w-full h-full flex items-center justify-center text-slate-300 bg-slate-50">
-                                        <i class="fas fa-image text-xl"></i>
-                                    </div>
+                                    <img src="{{ asset('images/product-placeholder.svg') }}" class="w-full h-full object-cover" alt="No image">
                                 @endif
                             </div>
                         </td>
@@ -273,3 +271,120 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const openAdd = document.getElementById('openAddModal');
+    const addModal = document.getElementById('addModal');
+    const closeAdd = document.getElementById('closeAddModal');
+    const cancelAdd = document.getElementById('cancelAddBtn');
+
+    function openModal() {
+        if (!addModal) return;
+        addModal.classList.remove('hidden');
+        addModal.classList.add('flex');
+    }
+
+    function closeModal() {
+        if (!addModal) return;
+        addModal.classList.add('hidden');
+        addModal.classList.remove('flex');
+    }
+
+    openAdd?.addEventListener('click', function (e) {
+        e.preventDefault();
+        openModal();
+    });
+
+    closeAdd?.addEventListener('click', closeModal);
+    cancelAdd?.addEventListener('click', closeModal);
+
+    addModal?.addEventListener('click', function (e) {
+        if (e.target === addModal) {
+            closeModal();
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            closeModal();
+        }
+    });
+
+    const mainImageInput = document.getElementById('mainImageInput');
+    const mainImagePreview = document.getElementById('mainImagePreview');
+    const tgPreviewImage = document.getElementById('tgPreviewImage');
+    const tgPreviewName = document.getElementById('tgPreviewName');
+    const tgPreviewPrice = document.getElementById('tgPreviewPrice');
+    const nameInput = document.querySelector('input[name="name"]');
+
+    mainImageInput?.addEventListener('change', function (e) {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const url = URL.createObjectURL(file);
+        if (mainImagePreview) {
+            mainImagePreview.innerHTML = '<img src="' + url + '" class="w-full h-full object-cover" alt="Preview">';
+        }
+        if (tgPreviewImage) {
+            tgPreviewImage.innerHTML = '<img src="' + url + '" class="w-full h-full object-cover" alt="Telegram preview">';
+        }
+    });
+
+    nameInput?.addEventListener('input', function () {
+        if (tgPreviewName) {
+            tgPreviewName.textContent = nameInput.value || 'Mahsulot nomi';
+        }
+    });
+
+    const priceInput = document.getElementById('priceInput');
+    const discountInput = document.getElementById('discountInput');
+    const finalInput = document.getElementById('finalPriceInput');
+
+    function recalcFinalPrice() {
+        const price = parseFloat(priceInput?.value || 0);
+        const discount = parseFloat(discountInput?.value || 0);
+        let final = price;
+
+        if (discount > 0) {
+            final = +(price * (1 - discount / 100)).toFixed(2);
+        }
+
+        if (finalInput) {
+            finalInput.value = final.toFixed(2);
+        }
+
+        if (tgPreviewPrice) {
+            tgPreviewPrice.textContent = '$' + final.toFixed(2);
+        }
+    }
+
+    priceInput?.addEventListener('input', recalcFinalPrice);
+    discountInput?.addEventListener('input', recalcFinalPrice);
+
+    const tgCheckbox = document.getElementById('telegramPublish');
+    const tgPreview = document.getElementById('telegramPreview');
+    tgCheckbox?.addEventListener('change', function (e) {
+        if (!tgPreview) return;
+
+        if (e.target.checked) {
+            tgPreview.classList.remove('hidden', 'opacity-0', 'scale-95');
+        } else {
+            tgPreview.classList.add('opacity-0', 'scale-95');
+            setTimeout(function () {
+                if (!tgCheckbox.checked) {
+                    tgPreview.classList.add('hidden');
+                }
+            }, 250);
+        }
+    });
+
+    const sortSelect = document.getElementById('sortSelect');
+    const filterForm = document.getElementById('filterForm');
+    sortSelect?.addEventListener('change', function () {
+        filterForm?.submit();
+    });
+});
+</script>
+@endpush
