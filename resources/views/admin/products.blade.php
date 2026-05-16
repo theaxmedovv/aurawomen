@@ -202,6 +202,17 @@
                         </div>
                     </div>
 
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Zaxira (Stock)</label>
+                            <input name="stock" type="number" value="0" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Brend</label>
+                            <input name="brand" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none text-sm">
+                        </div>
+                    </div>
+
                     <div class="bg-pink-50/30 p-6 rounded-[2rem] border border-pink-100/50 space-y-4">
                         <h4 class="text-sm font-bold text-pink-600 flex items-center gap-2">
                             <i class="fas fa-tag"></i> Narx va Chegirmalar
@@ -209,15 +220,15 @@
                         <div class="grid grid-cols-3 gap-4">
                             <div>
                                 <label class="block text-[10px] font-bold text-pink-400 uppercase mb-1">Asosiy Narx</label>
-                                <input name="price" type="number" id="priceInput" class="w-full px-3 py-2.5 bg-white border border-pink-100 rounded-xl focus:outline-none focus:border-pink-400 font-bold">
+                                <input name="price" type="number" id="priceInput" step="0.01" required class="w-full px-3 py-2.5 bg-white border border-pink-100 rounded-xl focus:outline-none focus:border-pink-400 font-bold">
                             </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-pink-400 uppercase mb-1">Chegirma (%)</label>
-                                <input name="discount_percentage" type="number" id="discountInput" class="w-full px-3 py-2.5 bg-white border border-pink-100 rounded-xl focus:outline-none focus:border-pink-400 font-bold">
+                                <input name="discount_percentage" type="number" id="discountInput" min="0" max="100" value="0" class="w-full px-3 py-2.5 bg-white border border-pink-100 rounded-xl focus:outline-none focus:border-pink-400 font-bold">
                             </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-pink-400 uppercase mb-1">Yakuniy Narx</label>
-                                <input name="final_price" id="finalPriceInput" readonly class="w-full px-3 py-2.5 bg-pink-100/50 border border-transparent rounded-xl font-extrabold text-pink-700">
+                                <input id="finalPriceInput" readonly class="w-full px-3 py-2.5 bg-pink-100/50 border border-transparent rounded-xl font-extrabold text-pink-700">
                             </div>
                         </div>
                     </div>

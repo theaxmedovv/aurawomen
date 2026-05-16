@@ -4,161 +4,137 @@
 @section('page-title', 'Telegram Posts Management')
 
 @section('content')
-    <!-- Create Post Button -->
-    <div class="mb-6">
-        <button class="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:shadow-lg transition">
-            <i class="fas fa-plus mr-2"></i>Create New Post
-        </button>
+    <div class="mb-6 flex items-center justify-between gap-4 flex-wrap">
+        <div>
+            <h3 class="text-xl font-bold text-slate-800">Telegram postlar</h3>
+            <p class="text-sm text-slate-500">Mahsulot qo‘shilganda yaratilgan postlar ro‘yxati.</p>
+        </div>
+        <a href="https://t.me/aurawomenuz" target="_blank" class="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:shadow-lg transition">
+            <i class="fab fa-telegram mr-2"></i>Open Channel
+        </a>
     </div>
 
-    <!-- Posts Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-        <!-- Post Card 1 -->
-        <div class="dashboard-card">
-            <div class="mb-4">
-                <div class="w-full h-48 rounded-lg bg-gradient-to-br from-pink-200 to-purple-200 flex items-center justify-center mb-4">
-                    <i class="fas fa-image text-pink-500 text-5xl"></i>
+    @forelse($posts as $post)
+        <div class="dashboard-card mb-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="flex items-start gap-4">
+                    <div class="w-16 h-16 rounded-xl bg-slate-100 overflow-hidden flex items-center justify-center flex-shrink-0">
+                        @if($post->image && \Illuminate\Support\Facades\Storage::disk('public')->exists($post->image))
+                            <img src="{{ asset('storage/' . $post->image) }}" class="w-full h-full object-cover" alt="{{ $post->title }}">
+                        @else
+                            <i class="fas fa-telegram text-slate-300 text-2xl"></i>
+                        @endif
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-slate-800">{{ $post->title }}</h4>
+                        <p class="text-sm text-slate-500 mt-1">{{ $post->description ?? 'No description' }}</p>
+                        <p class="text-xs text-slate-400 mt-2">
+                            {{ $post->created_at?->format('Y-m-d H:i') }}
+                            @if($post->product)
+                                • Product: <a href="{{ route('admin.products.edit', $post->product_id) }}" class="text-pink-600 hover:underline">{{ $post->product->name }}</a>
+                            @endif
+                        </p>
+                    </div>
                 </div>
-                <div class="flex items-center justify-between mb-3">
-                    <span class="inline-block bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full">Published</span>
-                    <span class="text-xs text-gray-500">Posted 2 hours ago</span>
-                </div>
-            </div>
-            <h3 class="text-lg font-bold text-gray-800 mb-2">Essence Pearl - New Arrival!</h3>
-            <p class="text-sm text-gray-600 mb-4">Discover our latest fragrance collection. Premium quality perfumes with exotic notes. Limited time offer - 20% off!</p>
-            <div class="grid grid-cols-3 gap-3 mb-4 text-center">
-                <div class="bg-blue-50 rounded-lg py-2">
-                    <p class="text-xs text-gray-600">Views</p>
-                    <p class="text-lg font-bold text-blue-600">2.5K</p>
-                </div>
-                <div class="bg-pink-50 rounded-lg py-2">
-                    <p class="text-xs text-gray-600">Reactions</p>
-                    <p class="text-lg font-bold text-pink-600">456</p>
-                </div>
-                <div class="bg-purple-50 rounded-lg py-2">
-                    <p class="text-xs text-gray-600">Shares</p>
-                    <p class="text-lg font-bold text-purple-600">128</p>
-                </div>
-            </div>
-            <div class="flex gap-2">
-                <button class="flex-1 border border-gray-200 text-gray-700 font-semibold py-2 rounded-lg hover:bg-gray-50 transition">
-                    <i class="fas fa-edit mr-1"></i> Edit
-                </button>
-                <button class="flex-1 border border-red-200 text-red-600 font-semibold py-2 rounded-lg hover:bg-red-50 transition">
-                    <i class="fas fa-trash mr-1"></i> Delete
-                </button>
-            </div>
-        </div>
 
-        <!-- Post Card 2 -->
-        <div class="dashboard-card">
-            <div class="mb-4">
-                <div class="w-full h-48 rounded-lg bg-gradient-to-br from-yellow-200 to-orange-200 flex items-center justify-center mb-4">
-                    <i class="fas fa-image text-yellow-600 text-5xl"></i>
-                </div>
-                <div class="flex items-center justify-between mb-3">
-                    <span class="inline-block bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full">Published</span>
-                    <span class="text-xs text-gray-500">Posted 5 hours ago</span>
-                </div>
-            </div>
-            <h3 class="text-lg font-bold text-gray-800 mb-2">Gold Elegance - Customer Review</h3>
-            <p class="text-sm text-gray-600 mb-4">Check out what our customers are saying about our Gold Elegance collection. 5-star rated! Shop now with free shipping.</p>
-            <div class="grid grid-cols-3 gap-3 mb-4 text-center">
-                <div class="bg-blue-50 rounded-lg py-2">
-                    <p class="text-xs text-gray-600">Views</p>
-                    <p class="text-lg font-bold text-blue-600">3.2K</p>
-                </div>
-                <div class="bg-pink-50 rounded-lg py-2">
-                    <p class="text-xs text-gray-600">Reactions</p>
-                    <p class="text-lg font-bold text-pink-600">678</p>
-                </div>
-                <div class="bg-purple-50 rounded-lg py-2">
-                    <p class="text-xs text-gray-600">Shares</p>
-                    <p class="text-lg font-bold text-purple-600">245</p>
-                </div>
-            </div>
-            <div class="flex gap-2">
-                <button class="flex-1 border border-gray-200 text-gray-700 font-semibold py-2 rounded-lg hover:bg-gray-50 transition">
-                    <i class="fas fa-edit mr-1"></i> Edit
-                </button>
-                <button class="flex-1 border border-red-200 text-red-600 font-semibold py-2 rounded-lg hover:bg-red-50 transition">
-                    <i class="fas fa-trash mr-1"></i> Delete
-                </button>
-            </div>
-        </div>
+                <div class="flex items-center gap-2 flex-wrap">
+                    @if($post->status === 'sent')
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">✓ Sent</span>
+                    @elseif($post->status === 'failed')
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">✗ Failed</span>
+                    @else
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700">⏱ Pending</span>
+                    @endif
 
-        <!-- Post Card 3 -->
-        <div class="dashboard-card">
-            <div class="mb-4">
-                <div class="w-full h-48 rounded-lg bg-gradient-to-br from-purple-200 to-pink-200 flex items-center justify-center mb-4">
-                    <i class="fas fa-image text-purple-500 text-5xl"></i>
-                </div>
-                <div class="flex items-center justify-between mb-3">
-                    <span class="inline-block bg-yellow-100 text-yellow-700 text-xs font-bold px-3 py-1 rounded-full">Scheduled</span>
-                    <span class="text-xs text-gray-500">Scheduled for tomorrow</span>
-                </div>
-            </div>
-            <h3 class="text-lg font-bold text-gray-800 mb-2">Luxury Rose - Special Promo</h3>
-            <p class="text-sm text-gray-600 mb-4">Flash sale alert! Luxury Rose collection at unbeatable prices. Only this week! Don't miss out on the best deals.</p>
-            <div class="grid grid-cols-3 gap-3 mb-4 text-center">
-                <div class="bg-blue-50 rounded-lg py-2">
-                    <p class="text-xs text-gray-600">Views</p>
-                    <p class="text-lg font-bold text-blue-600">-</p>
-                </div>
-                <div class="bg-pink-50 rounded-lg py-2">
-                    <p class="text-xs text-gray-600">Reactions</p>
-                    <p class="text-lg font-bold text-pink-600">-</p>
-                </div>
-                <div class="bg-purple-50 rounded-lg py-2">
-                    <p class="text-xs text-gray-600">Shares</p>
-                    <p class="text-lg font-bold text-purple-600">-</p>
-                </div>
-            </div>
-            <div class="flex gap-2">
-                <button class="flex-1 border border-gray-200 text-gray-700 font-semibold py-2 rounded-lg hover:bg-gray-50 transition">
-                    <i class="fas fa-edit mr-1"></i> Edit
-                </button>
-                <button class="flex-1 border border-red-200 text-red-600 font-semibold py-2 rounded-lg hover:bg-red-50 transition">
-                    <i class="fas fa-trash mr-1"></i> Delete
-                </button>
-            </div>
-        </div>
+                    @if($post->telegram_url)
+                        <a href="{{ $post->telegram_url }}" target="_blank" class="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700 hover:bg-blue-200 transition">
+                            <i class="fas fa-external-link-alt mr-1"></i>Open Post
+                        </a>
+                    @endif
 
-        <!-- Post Card 4 -->
-        <div class="dashboard-card">
-            <div class="mb-4">
-                <div class="w-full h-48 rounded-lg bg-gradient-to-br from-green-200 to-blue-200 flex items-center justify-center mb-4">
-                    <i class="fas fa-image text-green-600 text-5xl"></i>
-                </div>
-                <div class="flex items-center justify-between mb-3">
-                    <span class="inline-block bg-gray-100 text-gray-700 text-xs font-bold px-3 py-1 rounded-full">Draft</span>
-                    <span class="text-xs text-gray-500">Not published</span>
-                </div>
-            </div>
-            <h3 class="text-lg font-bold text-gray-800 mb-2">Summer Collection Preview</h3>
-            <p class="text-sm text-gray-600 mb-4">Get ready for summer! Preview of our upcoming summer fragrance collection. Coming next week with exclusive early access for subscribers.</p>
-            <div class="grid grid-cols-3 gap-3 mb-4 text-center">
-                <div class="bg-blue-50 rounded-lg py-2">
-                    <p class="text-xs text-gray-600">Views</p>
-                    <p class="text-lg font-bold text-blue-600">-</p>
-                </div>
-                <div class="bg-pink-50 rounded-lg py-2">
-                    <p class="text-xs text-gray-600">Reactions</p>
-                    <p class="text-lg font-bold text-pink-600">-</p>
-                </div>
-                <div class="bg-purple-50 rounded-lg py-2">
-                    <p class="text-xs text-gray-600">Shares</p>
-                    <p class="text-lg font-bold text-purple-600">-</p>
+                    @if($post->status === 'failed')
+                        <button onclick="retryPost({{ $post->id }})" class="px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-700 hover:bg-orange-200 transition">
+                            <i class="fas fa-redo mr-1"></i>Retry
+                        </button>
+                    @endif
+
+                    <button onclick="deletePost({{ $post->id }})" class="px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 hover:bg-red-200 transition">
+                        <i class="fas fa-trash mr-1"></i>Delete
+                    </button>
                 </div>
             </div>
-            <div class="flex gap-2">
-                <button class="flex-1 border border-gray-200 text-gray-700 font-semibold py-2 rounded-lg hover:bg-gray-50 transition">
-                    <i class="fas fa-edit mr-1"></i> Edit
-                </button>
-                <button class="flex-1 border border-green-200 text-green-600 font-semibold py-2 rounded-lg hover:bg-green-50 transition">
-                    <i class="fas fa-check mr-1"></i> Publish
-                </button>
-            </div>
+
+            @if($post->error_message)
+                <div class="mt-4 text-xs text-red-600 bg-red-50 border border-red-100 rounded-lg p-3">
+                    {{ $post->error_message }}
+                </div>
+            @endif
         </div>
+    @empty
+        <div class="dashboard-card border-dashed border-2 border-slate-200 bg-slate-50/70 text-center py-16">
+            <div class="w-16 h-16 mx-auto rounded-2xl bg-white shadow-sm flex items-center justify-center text-slate-300 mb-4">
+                <i class="fas fa-telegram text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Hali Telegram post yo‘q</h3>
+            <p class="text-sm text-slate-500 max-w-md mx-auto">
+                Yangi mahsulot qo‘shilganda bu yerda post paydo bo‘ladi va kanalga yuboriladi.
+            </p>
+        </div>
+    @endforelse
+
+    <div class="mt-6">
+        {{ $posts->links() }}
     </div>
+
+    <script>
+        function retryPost(postId) {
+            if (confirm('Postni qayta yubormoqchisiz?')) {
+                fetch(`/admin/telegram-posts/${postId}/retry`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Post muvaffaqiyatli yuborildi! Halaman qayta yuklanyapti...');
+                        location.reload();
+                    } else {
+                        alert('Xato: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Xato yuz berdi');
+                });
+            }
+        }
+
+        function deletePost(postId) {
+            if (confirm('Postni oʻchirishni xohlaysizmi? Bu amalni qaytarib bolmaydi!')) {
+                fetch(`/admin/telegram-posts/${postId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Post muvaffaqiyatli oʻchirildi! Halaman qayta yuklanyapti...');
+                        location.reload();
+                    } else {
+                        alert('Xato: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Xato yuz berdi');
+                });
+            }
+        }
+    </script>
 @endsection

@@ -1,0 +1,32 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('telegram_posts', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('product_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('title');
+            $table->text('description')->nullable();
+            $table->string('image')->nullable();
+            $table->longText('caption')->nullable();
+            $table->string('status')->default('pending');
+            $table->string('telegram_message_id')->nullable();
+            $table->string('telegram_chat_id')->nullable();
+            $table->string('telegram_url')->nullable();
+            $table->timestamp('sent_at')->nullable();
+            $table->text('error_message')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('telegram_posts');
+    }
+};

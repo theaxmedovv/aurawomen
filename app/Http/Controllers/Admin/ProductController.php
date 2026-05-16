@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
+use App\Services\TelegramService;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
@@ -74,6 +75,7 @@ class ProductController extends Controller
             'sale_start' => 'nullable|date',
             'sale_end' => 'nullable|date',
             'main_image' => 'nullable|image|max:4096',
+            'telegram_publish' => 'nullable|boolean',
         ]);
 
         if($request->hasFile('main_image')){
@@ -81,12 +83,26 @@ class ProductController extends Controller
             $data['image'] = $path;
         }
 
+        $data['discount_percentage'] = (int) ($data['discount_percentage'] ?? 0);
+        $data['stock'] = (int) ($data['stock'] ?? 0);
+        $data['availability'] = $request->boolean('availability', true);
+        $data['status'] = $data['status'] ?? 'active';
         $data['slug'] = Str::slug($data['name']) . '-' . rand(100,999);
-        $data['final_price'] = isset($data['discount_percentage']) && $data['discount_percentage'] > 0 ? round($data['price'] * (1 - $data['discount_percentage']/100),2) : ($data['sale_price'] ?? $data['price']);
+        $data['final_price'] = $data['discount_percentage'] > 0 ? round($data['price'] * (1 - $data['discount_percentage']/100),2) : ($data['sale_price'] ?? $data['price']);
 
         $product = Product::create($data);
 
-        return redirect()->route('admin.products.index')->with('success','Product created');
+        try {
+            $sent = app(TelegramService::class)->sendNewProduct($product);
+            if (! $sent) {
+                return redirect()->route('admin.products.index')->with('error', 'Product created, but Telegram send failed. Check bot token and channel permissions.');
+            }
+        } catch (\Throwable $e) {
+            report($e);
+            return redirect()->route('admin.products.index')->with('error', 'Product created, but Telegram send crashed.');
+        }
+
+        return redirect()->route('admin.products.index')->with('success', 'Product created and sent to Telegram channel.');
     }
 
     public function edit(Product $product)
@@ -119,7 +135,11 @@ class ProductController extends Controller
             $data['image'] = $path;
         }
 
-        $data['final_price'] = isset($data['discount_percentage']) && $data['discount_percentage'] > 0 ? round($data['price'] * (1 - $data['discount_percentage']/100),2) : ($data['sale_price'] ?? $data['price']);
+        $data['discount_percentage'] = (int) ($data['discount_percentage'] ?? 0);
+        $data['stock'] = (int) ($data['stock'] ?? 0);
+        $data['availability'] = $request->boolean('availability', false);
+        $data['status'] = $data['status'] ?? $product->status;
+        $data['final_price'] = $data['discount_percentage'] > 0 ? round($data['price'] * (1 - $data['discount_percentage']/100),2) : ($data['sale_price'] ?? $data['price']);
 
         $product->update($data);
 

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Product;
+use App\Models\TelegramPost;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CategoryController;
 
@@ -37,8 +38,35 @@ Route::middleware(['web'])->prefix('admin')->group(function () {
 
     // Telegram Posts
     Route::get('/telegram-posts', function() {
-        return view('admin.telegram-posts');
+        $posts = TelegramPost::with('product')->latest()->paginate(15);
+
+        return view('admin.telegram-posts', compact('posts'));
     })->name('admin.telegram-posts');
+
+    // Retry Telegram Post
+    Route::post('/telegram-posts/{post}/retry', function(TelegramPost $post) {
+        if (!$post->product) {
+            return response()->json(['success' => false, 'message' => 'Product not found'], 404);
+        }
+
+        $service = new \App\Services\TelegramService();
+        $result = $service->sendNewProduct($post->product);
+
+        return response()->json([
+            'success' => $result,
+            'message' => $result ? 'Post sent successfully!' : 'Failed to send post'
+        ]);
+    })->name('admin.telegram-posts.retry');
+
+    // Delete Telegram Post
+    Route::delete('/telegram-posts/{post}', function(TelegramPost $post) {
+        $post->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Post deleted successfully'
+        ]);
+    })->name('admin.telegram-posts.destroy');
 
     // Customers
     Route::get('/customers', function() {
